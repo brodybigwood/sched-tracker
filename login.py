@@ -12,6 +12,8 @@ from dotenv import load_dotenv
 import time
 import json
 
+from read import readData
+
 load_dotenv()
 
 url = os.environ.get('SCHEDULE_URL')
@@ -60,7 +62,6 @@ def login(driver):
             except Exception as e:
                 print(f"Error interacting with field '{key}': {e}")
 
-        # After filling all fields, you would typically find and click the login button
         login_button_xpath = f"//button[@type='{submit_button_type}'][contains(text(), '{submit_button_text}')]"
         submit = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, login_button_xpath))
@@ -84,8 +85,9 @@ def login(driver):
                 time.sleep(2)
             except Exception as e:
                 print(f"unable to interact with navigator '{id}': {e}")
+
+        print("accessed schedule")
     except Exception as e:
         print("Unable to interact with login fields, client must be logged in")
 
-
-    time.sleep(30000)
+    readData(driver)

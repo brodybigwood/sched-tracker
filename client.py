@@ -23,7 +23,7 @@ if chrome_exec_path:
         chrome_options.add_argument("--disable-dev-shm-usage")
 
     chrome_options.add_argument(f"user-agent={spoofed_user_agent}") 
-    
+
     chrome_options.binary_location = chrome_exec_path
 
     service = ChromeService(ChromeDriverManager().install())
@@ -31,10 +31,11 @@ if chrome_exec_path:
         driver = webdriver.Chrome(service=service, options=chrome_options)
         print("Chrome launched successfully by Selenium!")
 
-        login(driver)
-
-        driver.quit()
     except Exception as e:
         print(f"Error launching Chrome with Selenium: {e}")
+
+    login(driver)
+
+    driver.quit()
 else:
     print("CHROME_DRIVER_PATH environment variable not set")

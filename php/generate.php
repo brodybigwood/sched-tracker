@@ -2,41 +2,62 @@
 
 echo "<!DOCTYPE html>";
 echo "<html>";
-echo "<head>";
-echo "<title>Schedule</title>";
-echo "<link rel='stylesheet' href='style.css'>";
-echo "</head>";
-echo "<body>";
+    echo "<head>";
+    echo "<title>Schedule</title>";
+    echo "<link rel='stylesheet' href='style.css'>";
+    echo "</head>";
+    echo "<body>";
 
 
 
 
-$infile = '../currentWeek.json';
 
-$currentWeekJson = file_get_contents($infile);
-$employees = json_decode($currentWeekJson, true); // Decode JSON into an associative array
+        echo "<div id='top-bar' class='fixed-bar'>";
+        echo "</div>";
 
-if (is_array($employees)) {
-    foreach ($employees as $employee => $employeeData) {
-        generateUser($employeeData);
-    }
-} else {
-    echo "<p>Error: Could not decode JSON or the data is not an array.</p>";
-}
+        $infile = '../currentWeek.json';
+
+        $currentWeekJson = file_get_contents($infile);
+        $employees = json_decode($currentWeekJson, true); // Decode JSON into an associative array
+
+        if (is_array($employees)) {
+            foreach ($employees as $employee => $employeeData) {
+                generateUser($employeeData);
+            }
+        } else {
+            echo "<p>Error: Could not decode JSON or the data is not an array.</p>";
+        }
+
+        echo "<div id='bottom-bar' class='fixed-bar'>";
+            echo "<button class='navigator' id='scheduleBtn'></button>";
+            echo "<button class='navigator' id='scheduleBtn'></button>";
+            echo "<button class='navigator' id='scheduleBtn'></button>";
+        echo "</div>";
+
+
+    echo "</body>";
+echo "</html>";
 
 
 function generateUser($employeeData) {
     echo "<div class='employee'>";
-    generateName($employeeData);
+    echo "<h3>";
+        generateName($employeeData);
+        echo " - ";
+        generateRole($employeeData);
+    echo "</h3>";
     generateShifts($employeeData);
     echo "</div>";
 }
 
 function generateName($employeeData) {
-
     $employeeName = htmlspecialchars($employeeData['name']);
-    echo "<h3>" . $employeeName . "</h3>";
+    echo $employeeName;
+}
 
+function generateRole($employeeData) {
+    $employeeRole = htmlspecialchars($employeeData['role']);
+    echo $employeeRole;
 }
 
 function generateShifts($employeeData) {
@@ -125,8 +146,5 @@ function getTimeString(float $time24): string {
 
     return $hours12 . ":" . $minuteString . $period;
 }
-
-echo "</body>";
-echo "</html>";
 
 ?>

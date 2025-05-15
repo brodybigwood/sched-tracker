@@ -2,6 +2,9 @@ body {
     background-color: rgba(40, 40, 40, 255);
     color: white;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    padding-top: 10vh;
+    padding-bottom: 10vh;
+    box-sizing: border;
 }
 
 .employee {
@@ -46,4 +49,48 @@ body {
     padding: 3.5%;
     font-size: calc(1vw * 1.2); 
     line-height: 0;
+}
+
+#top-bar {
+    top: 0;
+    background-image: linear-gradient(to bottom, rgb(80, 40, 40), rgb(160, 80, 80) 80%);
+}
+
+#bottom-bar {
+
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+    background-image: linear-gradient(to top, rgb(80, 40, 40), rgb(160, 80, 80) 80%);
+}
+
+
+.fixed-bar {
+    height: 10vh;
+    width: 100%;
+    position: fixed;
+    z-index: 1000;
+}
+
+.navigator {
+    flex-grow: 1;
+    background-repeat: no-repeat; 
+    background-position: center; 
+    background-size: contain;
+    background-color: rgba(0,0,0,0);
+    border: 0;
+    filter: brightness(1); /* Start with no brightness change */
+    transition: filter 0.3s ease; /* Optional: Add a smooth transition */
+}
+
+.navigator:hover {
+    filter: brightness(0.7); /* Increase brightness on hover (adjust value as needed) */
+}
+
+.navigator:active {
+    filter: brightness(0.5); /* Even darker when actively pressed */
+}
+
+#scheduleBtn {
+    background-image: url('img/calendar.svg');
 }

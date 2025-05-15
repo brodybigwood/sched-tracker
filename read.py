@@ -42,6 +42,8 @@ def readData(driver):
 
 
     employees = []
+
+    employeeRole = ""
     
 
     for member in members:
@@ -50,7 +52,12 @@ def readData(driver):
             if not name:
                 continue
 
-
+            print(f"checking if {name.lower()} is a role")
+            extracted_role = extractRole(name.lower())
+            if extracted_role:
+                employeeRole = extracted_role
+                print("yes")
+                continue
 
             try:
                 days_xpath = os.environ.get('EMPLOYEE_DAY_ELEMENT')
@@ -61,8 +68,11 @@ def readData(driver):
                 days = []
                 days = member.find_elements(By.XPATH, "./"+days_xpath)
 
+
+
                 availability = ["n/a"] * 7
                 shifts = [None] * 7
+
                 try:
                     for i, day in enumerate(days):
 
@@ -103,9 +113,9 @@ def readData(driver):
 
             except Exception as e:
                 print(f"Error finding or listing children of '{member}': {e}")
-            
 
             employee = {
+                'role': employeeRole,
                 'name': name,
                 'availability': availability,
                 'shifts': shifts
@@ -146,9 +156,11 @@ def extractTime(hours_str):
         return None, None
 
 
-def extractRole(shift_str):
+def extractRole(string):
     for aliases in shift_roles:
         for alias in aliases:
-            alias = alias.lower()
-            if alias in shift_str:
+            lower_alias = alias.lower()
+            pattern = r"(?<![a-zA-Z])" + re.escape(lower_alias) + r"(?![a-zA-Z])"
+            if re.search(pattern, string):
                 return aliases[0]
+    return False

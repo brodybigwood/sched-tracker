@@ -1,0 +1,49 @@
+body {
+    background-color: rgba(40, 40, 40, 255);
+    color: white;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.employee {
+
+}
+
+.shiftList {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.workday {
+    width: calc(100% / 7);
+    height: 100px;
+    border: 1px solid #ccc;
+    background-color: rgb(80, 40, 40);
+}
+
+.empty-time {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.shift {
+    background-color: rgb(40, 40, 80);
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.shift h3 {
+    margin: 0;
+    padding: 2px;
+    font-size: calc(1vw * 1.4); 
+}
+
+.empty-time h3 {
+    margin: 0; 
+    margin-bottom: 0;
+    padding: 3.5%;
+    font-size: calc(1vw * 1.2); 
+    line-height: 0;
+}

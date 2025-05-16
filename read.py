@@ -4,12 +4,78 @@ import time
 import json
 import re
 
+import sqlite3
+
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
 load_dotenv()
+
+database_file = 'weeks.db'
+
+connection = sqlite3.connect(database_file)
+
+cursor = connection.cursor()
+
+
+
+
+connection = sqlite3.connect(database_file)
+cursor = connection.cursor()
+
+# *** ADD TABLE CREATION CODE HERE ***
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Weeks (
+        week_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        year INTEGER NOT NULL,
+        month INTEGER NOT NULL CHECK (month BETWEEN 1 AND 12),
+        day INTEGER NOT NULL CHECK (day BETWEEN 1 AND 31),
+        UNIQUE (year, month, day)
+    )
+''')
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Employees (
+        employee_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        role TEXT,
+        isOnSchedule INT CHECK (isOnSchedule BETWEEN 0 and 1)
+    )
+''')
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Availability (
+        availability_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        employee_id INTEGER,
+        week_id INTEGER,
+        day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+        start_time REAL,
+        end_time REAL,
+        FOREIGN KEY (employee_id) REFERENCES Employees(employee_id),
+        FOREIGN KEY (week_id) REFERENCES Weeks(week_id),
+        UNIQUE (employee_id, week_id, day_of_week)
+    )
+''')
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Shifts (
+        shift_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        employee_id INTEGER,
+        week_id INTEGER,
+        day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+        start_time REAL,
+        end_time REAL,
+        assigned_role TEXT,
+        FOREIGN KEY (employee_id) REFERENCES Employees(employee_id),
+        FOREIGN KEY (week_id) REFERENCES Weeks(week_id)
+    )
+''')
+
+connection.commit()
+
+
 
 outfile = "currentWeek.json"
 
@@ -24,6 +90,22 @@ except json.JSONDecodeError as e:
 
 
 def readData(driver):
+
+    year, month, day = getDate(driver)
+
+    print(f"schedule start: {month}/{day}")
+
+
+    cursor.execute('''
+        INSERT OR IGNORE INTO Weeks(year, month, day) VALUES (?, ?, ?)
+    ''',
+    (year, month, day))
+    cursor.execute('''
+    SELECT week_id FROM Weeks WHERE year= ? AND month = ? AND day = ?
+    ''', (year,month,day))
+    week_result = cursor.fetchone()
+    week_id = week_result[0]
+    print(week_id)
 
     table_xpath = os.environ.get('EMPLOYEES_XPATH')
 
@@ -59,6 +141,13 @@ def readData(driver):
                 print("yes")
                 continue
 
+            cursor.execute("INSERT OR IGNORE INTO Employees (name, role) VALUES (?, ?)", (name, employeeRole))
+            cursor.execute("SELECT employee_id FROM Employees WHERE name = ?", (name,))
+            employee_result = cursor.fetchone()
+            employee_db_id = employee_result[0]
+            cursor.execute("UPDATE Employees SET isOnSchedule = 1 WHERE employee_id = ?", (employee_db_id,))
+            print(employee_db_id)
+
             try:
                 days_xpath = os.environ.get('EMPLOYEE_DAY_ELEMENT')
                 availability_xpath = os.environ.get('EMPLOYEE_DAY_AVAILABILITY')
@@ -83,6 +172,9 @@ def readData(driver):
                             'start': startTime,
                             'end': endTime
                         }
+                        if startTime is not None and endTime is not None:
+                            cursor.execute("INSERT OR IGNORE INTO Availability (employee_id, week_id, day_of_week, start_time, end_time) VALUES (?, ?, ?, ?, ?)",(employee_db_id, week_id, i, startTime, endTime))
+                        
 
                         subElements = day.find_elements(By.XPATH, "./*")
                         numElements = len(subElements)
@@ -104,12 +196,14 @@ def readData(driver):
 
                             workday.append(shift)
 
+                            if startTime is not None and endTime is not None and role:
+                                cursor.execute("INSERT INTO Shifts (employee_id, week_id, day_of_week, start_time, end_time, assigned_role) VALUES (?, ?, ?, ?, ?, ?)",(employee_db_id, week_id, i, startTime, endTime, role))
+
                         shifts[i] = workday
 
                 except Exception as e:
                     print(f"error in day info: {e}")
-
-                        
+        
 
             except Exception as e:
                 print(f"Error finding or listing children of '{member}': {e}")
@@ -121,7 +215,7 @@ def readData(driver):
                 'shifts': shifts
             }
             employees.append(employee)
-
+            connection.commit()
             
         except Exception as e:
             print(f"{e}")
@@ -164,3 +258,35 @@ def extractRole(string):
             if re.search(pattern, string):
                 return aliases[0]
     return False
+
+
+date_path = os.environ.get('SCHEDULE_START_DATE_XPATH')
+
+months = [
+    "jan",
+    "feb",
+    "mar",
+    "apr",
+    "may",
+    "jun",
+    "jul",
+    "aug",
+    "sept",
+    "oct",
+    "nov",
+    "dec"
+]
+
+def getDate(driver):
+    date_raw = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, date_path))
+    ).text.lower()
+    for i, month in enumerate(months):
+        if month.lower() in date_raw:
+            match = re.search(r'\d+', date_raw)
+            day = int(match.group(0))
+            return 2025, i+1, day
+    return None        
+
+prevWeekPath = os.environ.get('SCHEDULE_PREV_WEEK_XPATH')
+nextWeekPath = os.environ.get('SCHEDULE_NEXT_WEEK_XPATH')

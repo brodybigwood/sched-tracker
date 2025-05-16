@@ -44,6 +44,7 @@ function setView(value) {
             .then(data => {
                 return data;
             }).then(data => {
+                constructDefaultPattern(data, employeeSortPattern);
                 employees = sort(data, employeeSortPattern);
                 listEmployees(employees);
             });
@@ -197,13 +198,30 @@ function searchEmployees(term) {
 
 }
 
+positionSortPattern = []
 
 employees = [];
 employeeSortPattern = {
     parameter: 'position',
-    pattern: [
-    ]
+    pattern: positionSortPattern
 }
+
+function constructDefaultPattern(elements, sortPattern) {
+    parameter = sortPattern.parameter;
+    pattern = sortPattern.pattern;
+
+    updated_pattern = [];
+
+    for(const element in elements) {
+        value = element[parameter];
+        if(!pattern.includes(value)) {
+            updated_pattern.push(value);
+        }
+    }
+
+}
+
+constructDefaultPattern
 
 
 function sort(elements, sortPattern) {
@@ -221,19 +239,10 @@ function sort(elements, sortPattern) {
         aIndex = false;
         bIndex = false;
 
-        if (!pattern.includes(paramA)) {
-            pattern.push(paramA);
-            aIndex = -1;
-        } else {
-            aIndex = pattern.indexOf(paramA);
-        }
 
-        if (!pattern.includes(paramB)) {
-            pattern.push(paramB);
-            bIndex = -1;
-        } else {
-            bIndex = pattern.indexOf(paramB);
-        }
+        aIndex = pattern.indexOf(paramA);
+
+        bIndex = pattern.indexOf(paramB);
 
         if(aIndex == bIndex == -1) {
             return 0;

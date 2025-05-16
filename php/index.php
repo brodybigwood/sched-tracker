@@ -29,9 +29,9 @@ echo "<html>";
         }
 
         echo "<div id='bottom-bar' class='fixed-bar'>";
+
             echo "<button class='navigator' id='scheduleBtn'></button>";
-            echo "<button class='navigator' id='scheduleBtn'></button>";
-            echo "<button class='navigator' id='scheduleBtn'></button>";
+
         echo "</div>";
 
 

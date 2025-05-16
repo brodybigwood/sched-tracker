@@ -53,15 +53,15 @@ body {
 
 #top-bar {
     top: 0;
-    background-image: linear-gradient(to bottom, rgb(80, 40, 40), rgb(160, 80, 80) 80%);
+    border-bottom: 2px solid rgb(80, 40, 40);
 }
 
 #bottom-bar {
-
+    border-top: 2px solid rgb(80, 40, 40);
     bottom: 0;
     display: flex;
     flex-direction: row;
-    background-image: linear-gradient(to top, rgb(80, 40, 40), rgb(160, 80, 80) 80%);
+
 }
 
 
@@ -70,6 +70,13 @@ body {
     width: 100%;
     position: fixed;
     z-index: 1000;
+    background-image: linear-gradient(
+        to top,
+        rgb(80, 40, 40),        /* Start color */
+        rgb(160, 80, 80) 70%,   /* Middle color, closer to the top */
+        rgb(160, 80, 80) 80%, /* New color right near the top */
+        rgb(120, 60, 60) 100% /* Final color (transparent) very near the top */
+    );
 }
 
 .navigator {
@@ -77,6 +84,7 @@ body {
     background-repeat: no-repeat; 
     background-position: center; 
     background-size: contain;
+    background-size: auto 80%;
     background-color: rgba(0,0,0,0);
     border: 0;
     filter: brightness(1); /* Start with no brightness change */

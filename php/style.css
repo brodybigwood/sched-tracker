@@ -5,6 +5,11 @@ body {
     padding-top: 10vh;
     padding-bottom: 10vh;
     box-sizing: border;
+    margin: 0;
+}
+
+html {
+    margin: 0;
 }
 
 .employee {
@@ -51,10 +56,7 @@ body {
     line-height: 0;
 }
 
-#top-bar {
-    top: 0;
-    border-bottom: 2px solid rgb(80, 40, 40);
-}
+
 
 #bottom-bar {
     border-top: 2px solid rgb(80, 40, 40);
@@ -67,7 +69,7 @@ body {
 
 .fixed-bar {
     height: 10vh;
-    width: 100%;
+    width: 100vw;
     position: fixed;
     z-index: 1000;
     background-image: linear-gradient(
@@ -77,6 +79,7 @@ body {
         rgb(160, 80, 80) 80%, /* New color right near the top */
         rgb(120, 60, 60) 100% /* Final color (transparent) very near the top */
     );
+    line-height: 10vh;
 }
 
 .navigator {
@@ -87,18 +90,110 @@ body {
     background-size: auto 80%;
     background-color: rgba(0,0,0,0);
     border: 0;
-    filter: brightness(1); /* Start with no brightness change */
-    transition: filter 0.3s ease; /* Optional: Add a smooth transition */
+    filter: brightness(1);
+    transition: filter 0.3s ease; 
 }
 
 .navigator:hover {
-    filter: brightness(0.7); /* Increase brightness on hover (adjust value as needed) */
+    filter: brightness(0.7); 
 }
 
 .navigator:active {
-    filter: brightness(0.5); /* Even darker when actively pressed */
+    filter: brightness(0.5); 
 }
 
 #scheduleBtn {
     background-image: url('img/calendar.svg');
 }
+
+#top-bar {
+    top: 0;
+    border-bottom: 2px solid rgb(80, 40, 40);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+
+#title {
+    margin-top: 0;
+    font-size: 5vh;
+    line-height: 5vh;
+    margin-left: 2.5vw;
+    white-space: nowrap;
+}
+
+#viewType {
+    font-size: 3vh;
+    line-height: 6vh;
+    margin-left: 2.5vw;
+    white-space: nowrap;
+    color: rgb(220, 220, 220);
+
+}
+
+#view {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    max-width: 90vh;
+    overflow-wrap: anywhere;
+    height: 10vh;
+}
+
+#dropdown {
+    background-image: url('img/search.svg');
+    height: 100%;
+    width: 10vh;
+    margin-right: 2.5vw;
+    margin-left: auto;
+  }
+
+
+  
+
+  
+  .dropdown-list {
+    list-style: none;
+    border-top: none;
+    position: fixed;
+    margin-right: 0;
+    right: 0;
+    width: 40vw;
+    z-index: 1002;
+    display: hidden; 
+    transform: translateX(100%); 
+    transition: transform 0.3s ease-in-out; 
+}
+
+.dropdown-list.open {
+    display: block; /* Make it visible */
+    transform: translateX(0); /* Slide into its final position */
+}
+  
+  .dropdown-list li {
+    cursor: pointer;
+    background-image: linear-gradient(
+        to top,
+        rgb(80, 40, 40),       
+        rgb(160, 80, 80) 70%,   
+        rgb(160, 80, 80) 80%, 
+        rgb(120, 60, 60) 100% 
+    );
+    filter: brightness(1);
+    transition: filter 0.3s ease; 
+
+    width: 100%;
+
+    height: 10vh;
+    font-size: 5vw;
+    line-height: 10vh;
+    text-align: right;
+    padding-right: 1vw;
+    box-sizing: border-box;
+  }
+  
+  .dropdown-list li:hover {
+    filter: brightness(0.7);
+  }
+  

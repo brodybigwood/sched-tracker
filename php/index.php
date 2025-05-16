@@ -3,8 +3,9 @@
 echo "<!DOCTYPE html>";
 echo "<html>";
     echo "<head>";
-    echo "<title>Schedule</title>";
-    echo "<link rel='stylesheet' href='style.css'>";
+        echo "<title>Schedule</title>";
+        echo "<link rel='stylesheet' href='style.css'>";
+        echo "<script defer src='script.js'></script>";
     echo "</head>";
     echo "<body>";
 
@@ -13,8 +14,30 @@ echo "<html>";
 
 
         echo "<div id='top-bar' class='fixed-bar'>";
+            echo "<div id='view'>";
+                echo "<a id='title'>Schedule View</a>";
+                echo "<a id='viewType'></a>";
+            echo "</div>";
+            echo "<button id='dropdown' class='navigator'>";
+            echo "</button>";
+
         echo "</div>";
 
+        $views = [
+            "Employee",
+            "Day",
+            "Position",
+            "Search..."
+        ];
+
+        echo "<ul class='dropdown-list'>";
+            foreach ($views as $view => $viewString) {
+                echo "<li>" . $viewString . "</li>";
+            }
+        echo "</ul>";
+
+
+        
         $infile = '../currentWeek.json';
 
         $currentWeekJson = file_get_contents($infile);
@@ -34,8 +57,8 @@ echo "<html>";
 
         echo "</div>";
 
-
     echo "</body>";
+    echo "<a target='_blank' href='https://icons8.com/icon/131/search'>Search</a> icon by <a target='_blank' href='https://icons8.com'>Icons8</a>";
 echo "</html>";
 
 

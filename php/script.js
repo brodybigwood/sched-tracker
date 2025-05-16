@@ -41,3 +41,20 @@ function setView(value) {
 }
 
 setView('employee');
+
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then((registration) => {
+          console.log('Service worker registered! Scope:', registration.scope);
+
+        })
+        .catch((err) => {
+          console.log('Service worker registration failed:', err);
+
+        });
+    });
+  } else {
+    console.log('Service workers are not supported in this browser.');
+  }

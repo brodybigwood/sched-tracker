@@ -24,7 +24,7 @@ html {
 
 .workday {
     width: calc(100% / 7);
-    height: 100px;
+    height: 10vh;
     border: 1px solid #ccc;
     background-color: rgb(80, 40, 40);
 }

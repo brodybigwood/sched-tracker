@@ -1,4 +1,5 @@
 create .env in root project folder and add ur variables
 
-also install chromedriver
+install chrome
 
+install php and enable sqlite3

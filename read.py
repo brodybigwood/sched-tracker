@@ -40,13 +40,14 @@ cursor.execute('''
     CREATE TABLE IF NOT EXISTS Employees (
         employee_id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        role TEXT,
-        isOnSchedule INT CHECK (isOnSchedule BETWEEN 0 and 1)
+        position TEXT,
+        isOnSchedule INT CHECK (isOnSchedule BETWEEN 0 and 1),
+        UNIQUE (name)
     )
 ''')
 
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS Availability (
+    CREATE TABLE IF NOT EXISTS Availabilities (
         availability_id INTEGER PRIMARY KEY AUTOINCREMENT,
         employee_id INTEGER,
         week_id INTEGER,
@@ -67,9 +68,11 @@ cursor.execute('''
         day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
         start_time REAL,
         end_time REAL,
-        assigned_role TEXT,
+        assigned_position TEXT,
         FOREIGN KEY (employee_id) REFERENCES Employees(employee_id),
         FOREIGN KEY (week_id) REFERENCES Weeks(week_id)
+
+        UNIQUE (employee_id, week_id, day_of_week, start_time, end_time)
     )
 ''')
 
@@ -141,7 +144,7 @@ def readData(driver):
                 print("yes")
                 continue
 
-            cursor.execute("INSERT OR IGNORE INTO Employees (name, role) VALUES (?, ?)", (name, employeeRole))
+            cursor.execute("INSERT OR IGNORE INTO Employees (name, position) VALUES (?, ?)", (name, employeeRole))
             cursor.execute("SELECT employee_id FROM Employees WHERE name = ?", (name,))
             employee_result = cursor.fetchone()
             employee_db_id = employee_result[0]
@@ -173,7 +176,7 @@ def readData(driver):
                             'end': endTime
                         }
                         if startTime is not None and endTime is not None:
-                            cursor.execute("INSERT OR IGNORE INTO Availability (employee_id, week_id, day_of_week, start_time, end_time) VALUES (?, ?, ?, ?, ?)",(employee_db_id, week_id, i, startTime, endTime))
+                            cursor.execute("INSERT OR IGNORE INTO Availabilities (employee_id, week_id, day_of_week, start_time, end_time) VALUES (?, ?, ?, ?, ?)",(employee_db_id, week_id, i, startTime, endTime))
                         
 
                         subElements = day.find_elements(By.XPATH, "./*")
@@ -197,7 +200,7 @@ def readData(driver):
                             workday.append(shift)
 
                             if startTime is not None and endTime is not None and role:
-                                cursor.execute("INSERT INTO Shifts (employee_id, week_id, day_of_week, start_time, end_time, assigned_role) VALUES (?, ?, ?, ?, ?, ?)",(employee_db_id, week_id, i, startTime, endTime, role))
+                                cursor.execute("INSERT OR IGNORE INTO Shifts (employee_id, week_id, day_of_week, start_time, end_time, assigned_position) VALUES (?, ?, ?, ?, ?, ?)",(employee_db_id, week_id, i, startTime, endTime, role))
 
                         shifts[i] = workday
 

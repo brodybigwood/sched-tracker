@@ -12,8 +12,33 @@ html {
     margin: 0;
 }
 
-.employee {
+.position-header {
+    height: 10vh;
+    width: 80%;
+    text-align: center;
+    padding-bottom: 1px;
+    border-bottom: 1px solid white;
+    line-height: normal;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
 
+.employee {
+    height: 15vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.employee h3 {
+    font-size: 3vh;
+    height: calc(100% /3);
+    display: flex;
+    align-items: center;
+    margin: 0;
+    line-height: normal;
 }
 
 .shiftList {
@@ -35,6 +60,15 @@ html {
     align-items: flex-end;
 }
 
+.empty-time h3 {
+    margin: 0; 
+    margin-bottom: 0;
+    padding: 3.5%;
+    font-size: calc(1vw * 1.2); 
+    line-height: 0;
+}
+
+
 .shift {
     background-color: rgb(40, 40, 80);
     display: flex; 
@@ -46,14 +80,6 @@ html {
     margin: 0;
     padding: 2px;
     font-size: calc(1vw * 1.4); 
-}
-
-.empty-time h3 {
-    margin: 0; 
-    margin-bottom: 0;
-    padding: 3.5%;
-    font-size: calc(1vw * 1.2); 
-    line-height: 0;
 }
 
 

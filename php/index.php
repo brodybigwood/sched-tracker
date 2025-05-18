@@ -40,16 +40,24 @@ echo "<html>";
             echo "</button>";
 
         echo "</div>";
+        echo "<div id='sub-top' class='fixed-bar'>";
+        // Add the content for your second bar here
+            echo "<button id='prev-week' class='week-nav' onclick='week(-1)'>Previous Week</button>";
+            echo "<span id='current-week-display'></span>";
+            echo "<button id='next-week' class='week-nav' onclick='week(1)'>Next Week</button>";
+        echo "</div>";
 
-        $views = [
+        $buttons = [
+            "Next Week...",
+            "Previous Week...",
             "Employees",
             "Days",
             "Positions",
         ];
 
         echo "<ul class='dropdown-list'>";
-            foreach ($views as $view => $viewString) {
-                echo "<li>" . $viewString . "</li>";
+            foreach ($buttons as $button => $string) {
+                echo "<li>" . $string . "</li>";
             }
         echo "</ul>";
 

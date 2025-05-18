@@ -21,10 +21,6 @@ cursor = connection.cursor()
 
 
 
-
-connection = sqlite3.connect(database_file)
-cursor = connection.cursor()
-
 # *** ADD TABLE CREATION CODE HERE ***
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS Weeks (
@@ -93,6 +89,8 @@ except json.JSONDecodeError as e:
 
 
 def readData(driver):
+
+    time.sleep(15)
 
     year, month, day = getDate(driver)
 

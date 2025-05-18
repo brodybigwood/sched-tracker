@@ -3,6 +3,8 @@ const dropdownList = document.querySelector('.dropdown-list');
 const selectedOptionSpan = document.querySelector('#selected-option');
 const dropdownItems = document.querySelectorAll('.dropdown-list li');
 
+const currentWeekDisplay = document.getElementById('current-week-display');
+
 const viewType = document.getElementById('viewType');
 table = document.getElementById('table');
 
@@ -16,9 +18,10 @@ dropdown.addEventListener('click', () => {
 
 dropdownItems.forEach(item => {
   item.addEventListener('click', () => {
-    const selectedText = item.textContent;
+    const text = item.textContent;
     dropdownList.classList.remove('open');
     const selectedValue = item.textContent.replace(/ /g, '_');
+
     setView(selectedValue);
 
   });
@@ -36,20 +39,21 @@ document.addEventListener('click', (event) => {
   });
 
 
-function setView(value) {
+  function setView(value) {
     setViewIndicator(value);
     if(value == 'Employees') {
-
-        fetchJSON(1, 'Employees')
+        return fetchJSON(currentWeek, 'Employees')
             .then(data => {
-                return data;
-            }).then(data => {
+                if (data === null) {
+                    return false;
+                }
                 constructDefaultPattern(data, employeeSortPattern);
                 employees = sort(data, employeeSortPattern);
                 listEmployees(employees);
+                return true;
             });
-
-
+    } else {
+        return Promise.resolve(true);
     }
 }
 
@@ -58,7 +62,6 @@ function setViewIndicator(string) {
 }
 
 function listEmployees(employees) {
-    console.log(employees);
     const new_table = document.createElement('div');
     position = ""
     for(const employee of employees) {
@@ -72,18 +75,17 @@ function listEmployees(employees) {
                 position_header.innerText = position;
             new_table.appendChild(position_header);
         }
-        name = employee.name;
+        _name = employee.name;
 
         const employeeDiv = document.createElement('div');
         employeeDiv.classList.add('employee');
             header = document.createElement('h3');
-            header.innerText = name;
+            header.innerText = _name;
             employeeDiv.appendChild(header);
 
             shiftList = document.createElement('div');
             shiftList.classList.add('shiftList');
                 shifts = employee.shifts;
-                console.log(shifts);
                 day_of_week = 0;
                 prevEnd = 0;
 
@@ -105,8 +107,6 @@ function listEmployees(employees) {
                     //hours = shift.hours;
                     start = shift.start_time;
                     end = shift.end_time;
-
-                    console.log(start+' '+end)
 
                     emptyTime = document.createElement('div');
                     emptyTime.classList.add('empty-time');
@@ -145,7 +145,6 @@ function getTimeString(time24) {
     hours24 = Math.floor(time24);
     minutes = Math.round((time24 - hours24) * 60);
 
-    // Handle edge case for minutes being 60
     if (minutes === 60) {
         hours24++;
         minutes = 0;
@@ -264,9 +263,8 @@ function sort(elements, sortPattern) {
 
 
 function fetchJSON(week, queryType) {
-    const url = `db_to_json.php?weekId=${week}&queryType=${queryType}`;
+    const url = `db_to_json.php?week=${week}&queryType=${queryType}`;
     console.log(`url ${url}`)
-
     return fetch(url)
         .then(response => {
             if(!response.ok) {
@@ -278,23 +276,60 @@ function fetchJSON(week, queryType) {
 
 
 
+function getWeek() {
+    const today = new Date();
+    const offsetDate = new Date(today); 
+  
+    offsetDate.setDate(today.getDate() + (7 * weekOffset));
 
+    const dayOfWeek = offsetDate.getDay(); 
+    const diff = offsetDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); 
+    const monday = new Date(offsetDate.setDate(diff));
+    const year = monday.getFullYear();
+    const month = monday.getMonth();
+    const day = monday.getDate();
+    return `${year}-${month}-${day}`;
+  }
+  
+weekOffset = 0;
 
+function week(move) {
+    prevWeekOffset = weekOffset;
+    prevCurrentWeek = currentWeek;
+    weekOffset+=move;
+    currentWeek = getWeek();
+    setView('Employees')
+    .then(result => {
+        if (result === true) {
+            console.log("Employee view updated successfully.");
 
+            const today = new Date();
+            const offsetDate = new Date(today); 
+          
+            offsetDate.setDate(today.getDate() + (7 * weekOffset));
 
+            const date = new Date(); // Or any specific Date object
 
+            const optionsMonth = { month: 'long' };
+            const monthName = date.toLocaleDateString(undefined, optionsMonth);
 
+            const optionsDay = { day: 'numeric' }; 
+            const dayNumber = date.toLocaleDateString(undefined, optionsDay);
 
-setView('Employees');
+            currentWeekDisplay.textContent = 'Week: ' + monthName + ' ' + dayNumber;
+        } else {
+            alert('no data for desired week!');
+            weekOffset = prevWeekOffset;
+            currentWeek = prevCurrentWeek;
+        }
+    });
+}
 
+currentWeek = getWeek();
 
+console.log(currentWeek)
 
-
-
-
-
-
-
+week(0);
 
 
 

@@ -108,6 +108,40 @@ html {
     line-height: 10vh;
 }
 
+#sub-top {
+    height: 5vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#current-week-display {
+    flex-grow: 1;
+    height: 100%;
+    line-height: normal;
+    width: 50%;
+    text-align: center;
+}
+
+.week-nav {
+    height: 100%;
+    flex-grow: 1;
+    margin: 0;
+    text-align: center;
+    color: white;
+    padding: 0;
+    box-sizing: border-box;
+
+    border: 2px solid rgb(80, 40, 40);
+    background-image: linear-gradient(
+        to top,
+        rgb(80, 40, 40),        /* Start color */
+        rgb(160, 80, 80) 70%,   /* Middle color, closer to the top */
+        rgb(160, 80, 80) 80%, /* New color right near the top */
+        rgb(120, 60, 60) 100% /* Final color (transparent) very near the top */
+    );
+}
+
 .navigator {
     flex-grow: 1;
     background-repeat: no-repeat; 

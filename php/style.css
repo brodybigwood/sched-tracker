@@ -113,14 +113,21 @@ html {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
+    background-image: linear-gradient(
+        to top,
+        rgb(85, 85, 85),        /* Dark grey start */
+        rgb(170, 170, 170) 70%,   /* Light grey middle, closer to top */
+        rgb(170, 170, 170) 80%, /* Another light grey near the top */
+        rgb(140, 140, 140) 100% /* Medium-dark grey very near the top */
+    );
 }
 
 #current-week-display {
     flex-grow: 1;
-    height: 100%;
-    line-height: normal;
-    width: 50%;
     text-align: center;
+    color: white;
+    text-shadow: 1px 1px 1px black;
 }
 
 .week-nav {
@@ -132,13 +139,13 @@ html {
     padding: 0;
     box-sizing: border-box;
 
-    border: 2px solid rgb(80, 40, 40);
+    border: 2px solid rgb(128, 128, 128); /* Medium grey border */
     background-image: linear-gradient(
         to top,
-        rgb(80, 40, 40),        /* Start color */
-        rgb(160, 80, 80) 70%,   /* Middle color, closer to the top */
-        rgb(160, 80, 80) 80%, /* New color right near the top */
-        rgb(120, 60, 60) 100% /* Final color (transparent) very near the top */
+        rgb(60, 60, 60),        /* Dark grey start */
+        rgb(150, 150, 150) 70%,   /* Light grey middle, closer to top */
+        rgb(150, 150, 150) 80%, /* Another light grey near the top */
+        rgb(125, 125, 125) 100% /* Medium-dark grey very near the top */
     );
 }
 
@@ -181,6 +188,7 @@ html {
     line-height: 5vh;
     margin-left: 2.5vw;
     white-space: nowrap;
+    text-shadow: 1px 1px 1px black;
 }
 
 #viewType {

@@ -43,7 +43,7 @@ echo "<html>";
         echo "<div id='sub-top' class='fixed-bar'>";
         // Add the content for your second bar here
             echo "<button id='prev-week' class='week-nav' onclick='week(-1)'>Previous Week</button>";
-            echo "<span id='current-week-display'></span>";
+            echo "<a id='current-week-display'></a>";
             echo "<button id='next-week' class='week-nav' onclick='week(1)'>Next Week</button>";
         echo "</div>";
 

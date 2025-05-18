@@ -308,15 +308,19 @@ function week(move) {
           
             offsetDate.setDate(today.getDate() + (7 * weekOffset));
 
-            const date = new Date(); // Or any specific Date object
+            const dayOfWeek = offsetDate.getDay(); 
+
+            const diff = offsetDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); 
+            const monday = new Date(offsetDate.setDate(diff));
 
             const optionsMonth = { month: 'long' };
-            const monthName = date.toLocaleDateString(undefined, optionsMonth);
+            const monthName = monday.toLocaleDateString(undefined, optionsMonth);
 
             const optionsDay = { day: 'numeric' }; 
-            const dayNumber = date.toLocaleDateString(undefined, optionsDay);
+            const dayNumber = monday.toLocaleDateString(undefined, optionsDay);
 
             currentWeekDisplay.textContent = 'Week: ' + monthName + ' ' + dayNumber;
+            
         } else {
             alert('no data for desired week!');
             weekOffset = prevWeekOffset;

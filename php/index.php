@@ -22,7 +22,7 @@ session_start();
 
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
     // User is logged in, redirect to home.html
-    header("Location: login.php");
+    header("Location: app.php");
     exit;
 } else {
     // User is not logged in, redirect to login.php

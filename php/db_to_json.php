@@ -1,5 +1,15 @@
 <?php
 
+session_start();
+
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+
+    header("Location: login.php");
+    exit; 
+}
+
+
 $databaseFile = '../weeks.db';
 
 
@@ -11,7 +21,7 @@ $allowedTypes = ['Employees', 'Weeks', 'Shifts', 'Availabilities', 'Positions'];
 
 if (!in_array($queryType, $allowedTypes)) {
     echo 'error';
-    exit(); // Stop script execution if $queryType is not in $allowedTypes
+    exit();
 }
 
 try {

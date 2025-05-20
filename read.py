@@ -11,6 +11,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
+from passlib.hash import bcrypt  
+
+
 load_dotenv()
 
 database_file = 'weeks.db'
@@ -22,6 +25,7 @@ cursor = connection.cursor()
 
 
 # *** ADD TABLE CREATION CODE HERE ***
+
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS Weeks (
         week_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,6 +42,8 @@ cursor.execute('''
         name TEXT NOT NULL,
         position TEXT,
         isOnSchedule INT CHECK (isOnSchedule BETWEEN 0 and 1),
+        password_hash TEXT,
+        is_admin INTEGER DEFAULT 0 CHECK (is_admin BETWEEN 0 and 1),
         UNIQUE (name)
     )
 ''')
@@ -110,6 +116,8 @@ def readData(driver):
 
     table_xpath = os.environ.get('EMPLOYEES_XPATH')
 
+    admins = os.environ.get('ADMIN_NAMES')
+
     members = []
 
     try:
@@ -146,6 +154,12 @@ def readData(driver):
             cursor.execute("SELECT employee_id FROM Employees WHERE name = ?", (name,))
             employee_result = cursor.fetchone()
             employee_db_id = employee_result[0]
+
+            if name in admins:
+                password = os.environ.get("ADMIN_PASSWORD")
+                hashed_password = bcrypt.hash(password)
+                cursor.execute("UPDATE Employees SET is_admin = 1, password_hash = ? WHERE employee_id = ?", (hashed_password, employee_db_id,))
+
             cursor.execute("UPDATE Employees SET isOnSchedule = 1 WHERE employee_id = ?", (employee_db_id,))
             print(employee_db_id)
 

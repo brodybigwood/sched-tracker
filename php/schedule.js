@@ -18,6 +18,18 @@ const weekDays = [
     'Sunday'
 ]
 
+
+let weekOffset;
+let currentWeek;
+
+let scroll;
+
+var view;
+
+
+
+
+
 dropdown.addEventListener('click', () => {
     const isDropdownOpen = dropdownList.classList.contains('open');
   
@@ -30,9 +42,9 @@ dropdownItems.forEach(item => {
   item.addEventListener('click', () => {
     const text = item.textContent;
     dropdownList.classList.remove('open');
-    const selectedValue = item.textContent.replace(/ /g, '_');
-
-    setView(selectedValue);
+    const newView = item.textContent.replace(/ /g, '_');
+    view = newView;
+    setView();
 
   });
 });
@@ -51,9 +63,9 @@ document.addEventListener('click', (event) => {
   var positionSortPattern = [];
 
 
-  function setView(value) {
-    setViewIndicator(value);
-    if(value == 'Employees') {
+  function setView() {
+    setViewIndicator();
+    if(view == 'Employees') {
         return fetchJSON(currentWeek, 'Employees')
             .then(data => {
                 if (data === null) {
@@ -64,13 +76,13 @@ document.addEventListener('click', (event) => {
                 listEmployees(employees);
                 return true;
             });
-    } else if(value == 'Positions') {
+    } else if(view == 'Positions') {
         return fetchJSON(currentWeek, 'Shifts')
             .then(shiftsUnsorted => {
                 if (shiftsUnsorted === null) {
                     return false;
                 }
-
+                
                 shiftsByPostion = shiftsUnsorted.reduce((accumulator, currentItem) => {
                     const attributeValue = currentItem['assigned_position']; 
             
@@ -85,8 +97,10 @@ document.addEventListener('click', (event) => {
                 }, {});
 
                 const shiftsSorted = Object.entries(shiftsByPostion).sort((a, b) => a[0].localeCompare(b[0])); 
-
+                
                 listPositions(shiftsSorted);
+
+                return true;
 
             })
     } else {
@@ -191,8 +205,8 @@ function listPositions(shiftsSorted) {
     table.innerHTML = new_table.innerHTML;
 }
 
-function setViewIndicator(string) {
-    viewType.textContent = "Search "+string.toLowerCase()+"...";
+function setViewIndicator() {
+    viewType.textContent = "Search "+view.toLowerCase()+"...";
 }
 
 function listEmployees(employees) {
@@ -417,14 +431,14 @@ function getWeek() {
     return `${year}-${month}-${day}`;
   }
   
-weekOffset = 0;
+
 
 function week(move) {
     prevWeekOffset = weekOffset;
     prevCurrentWeek = currentWeek;
     weekOffset+=move;
     currentWeek = getWeek();
-    setView('Employees')
+    return setView()
     .then(result => {
         if (result === true) {
             console.log("Employee view updated successfully.");
@@ -455,14 +469,6 @@ function week(move) {
     });
 }
 
-currentWeek = getWeek();
-
-console.log(currentWeek)
-
-week(0);
-
-
-
 
 
 
@@ -482,3 +488,41 @@ if ('serviceWorker' in navigator) {
   } else {
     console.log('Service workers are not supported in this browser.');
   }
+
+
+
+  window.addEventListener('load', () => {
+
+    window.addEventListener('message', (event) => {
+
+        // if (event.origin !== 'http://yourparentdomain.com') {
+        //    console.warn('Message received from unknown origin:', event.origin);
+        //    return; // Ignore messages from untrusted origins
+        // }
+
+        try {
+            const receivedJsonString = event.data;
+            const parsedData = JSON.parse(receivedJsonString);
+
+            scroll = parsedData.scrolltop;
+            weekOffset = 0;
+            currentWeek = getWeek();
+            view = parsedData.viewType;
+            
+            week(0).then(result => {
+                window.scrollTo({
+                    top: scroll,
+                });
+            })
+
+
+
+            
+        } catch (e) {
+            console.error('Iframe received non-JSON message or parsing error:', e, event.data);
+        }
+    });
+
+    console.log('Iframe listener ready.');
+});
+

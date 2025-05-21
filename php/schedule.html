@@ -1,0 +1,26 @@
+<script defer src="schedule.js"></script>
+<link rel="stylesheet" href="schedule.css">
+
+
+    <div id="top-bar" class="fixed-bar">
+        <div id="viewDiv">
+            <a id="title">Schedule View</a>
+            <a id="viewType"></a>
+        </div>
+        <button id="dropdown" class="navigator"></button>
+    </div>
+
+    <div id="sub-top" class="fixed-bar">
+        <button id="prev-week" class="week-nav" onclick="week(-1)">Previous Week</button>
+        <a id="current-week-display"></a>
+        <button id="next-week" class="week-nav" onclick="week(1)">Next Week</button>
+    </div>
+
+    <ul class="dropdown-list">
+        <li>Employees</li>
+        <li>Positions</li>
+    </ul>
+
+    <div id="table">
+
+    </div>

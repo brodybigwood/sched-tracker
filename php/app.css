@@ -1,0 +1,78 @@
+
+#bottom-bar {
+    height: 10vh;
+    width: 100vw;
+    position: fixed;
+    z-index: 1000;
+    background-image: linear-gradient(
+        to top,
+        rgb(80, 40, 40),        /* Start color */
+        rgb(160, 80, 80) 70%,   /* Middle color, closer to the top */
+        rgb(160, 80, 80) 80%, /* New color right near the top */
+        rgb(120, 60, 60) 100% /* Final color (transparent) very near the top */
+    );
+    line-height: 10vh;
+
+    border-top: 2px solid rgb(80, 40, 40);
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+
+}
+
+body {
+    height: 90vh;
+    background-color: rgba(40, 40, 40, 255);
+    color: white;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    padding-bottom: 10vh;
+    box-sizing: border;
+    margin: 0;
+}
+
+html {
+    height: 100%;
+    margin: 0;
+}
+
+
+.navigator {
+    flex-grow: 1;
+    background-repeat: no-repeat; 
+    background-position: center; 
+    background-size: contain;
+    background-size: auto 80%;
+    background-color: rgba(0,0,0,0);
+    border: 0;
+    filter: brightness(1);
+    transition: filter 0.3s ease; 
+}
+
+.navigator:hover {
+    filter: brightness(0.7); 
+}
+
+.navigator:active {
+    filter: brightness(0.5); 
+}
+
+#scheduleBtn {
+    background-image: url('img/calendar.svg');
+}
+
+#chatbotBtn {
+    background-image: url('img/chatbot.svg');
+}
+
+#settingsBtn {
+    background-image: url('img/settings.svg');
+}
+
+#currentView {
+    position: absolute;
+    top: 0;
+    margin: 0;
+    width: 100vw; 
+    height: 90vw; 
+    border: none;
+}

@@ -9,6 +9,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit; 
 }
 
+header('Content-Type: application/json');
 
 $databaseFile = '../weeks.db';
 
@@ -80,6 +81,25 @@ try {
             $row['shifts'] = $shiftsForEmployee; // Add 'shifts' as a key to the $row array
             $listItems[] = $row;
         }
+    } else if ($queryType == 'Shifts') {
+        $shiftMatches = $db->query("SELECT * FROM Shifts WHERE week_id = " . $weekId);
+        while ($shiftRow = $shiftMatches->fetchArray(SQLITE3_ASSOC)) {
+            $employee_id = $shiftRow['employee_id'];
+
+            $get_employee = $db->query('SELECT * FROM EMPLOYEES WHERE employee_id = ' . $employee_id);
+            $employee = $get_employee->fetchArray(SQLITE3_ASSOC);
+            $employee_name = $employee['name'];
+
+            $shift = array(
+                'start_time' => $shiftRow['start_time'],
+                'end_time' => $shiftRow['end_time'],
+                'day_of_week' => $shiftRow['day_of_week'],
+                'assigned_position' => $shiftRow['assigned_position'],
+                'employeeName' => $employee_name
+            );
+            $listItems[] = $shift;
+        }
+
     } else {
         while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
             $listItems[] = $row;
@@ -88,11 +108,12 @@ try {
 
     $results->finalize();
     
-    header('Content-Type: application/json');
+
     echo json_encode($listItems);
+    $db->close();
     exit();
 
-    $db->close();
+
 
 } catch (Exception $e) {
     http_response_code(500); // Internal Server Error

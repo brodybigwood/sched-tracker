@@ -25,10 +25,7 @@
     </div>
 
     <ul class="dropdown-list">
-        <li>Next Week...</li>
-        <li>Previous Week...</li>
         <li>Employees</li>
-        <li>Days</li>
         <li>Positions</li>
     </ul>
 

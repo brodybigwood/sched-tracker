@@ -66,11 +66,11 @@ cursor.execute('''
     CREATE TABLE IF NOT EXISTS Shifts (
         shift_id INTEGER PRIMARY KEY AUTOINCREMENT,
         employee_id INTEGER,
-        week_id INTEGER,
-        day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
         start_time REAL,
         end_time REAL,
+        day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
         assigned_position TEXT,
+        week_id INTEGER,
         FOREIGN KEY (employee_id) REFERENCES Employees(employee_id),
         FOREIGN KEY (week_id) REFERENCES Weeks(week_id)
 

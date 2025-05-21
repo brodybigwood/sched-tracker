@@ -8,6 +8,16 @@ const currentWeekDisplay = document.getElementById('current-week-display');
 const viewType = document.getElementById('viewType');
 table = document.getElementById('table');
 
+const weekDays = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday'
+]
+
 dropdown.addEventListener('click', () => {
     const isDropdownOpen = dropdownList.classList.contains('open');
   
@@ -38,6 +48,8 @@ document.addEventListener('click', (event) => {
     }
   });
 
+  var positionSortPattern = [];
+
 
   function setView(value) {
     setViewIndicator(value);
@@ -47,14 +59,136 @@ document.addEventListener('click', (event) => {
                 if (data === null) {
                     return false;
                 }
-                constructDefaultPattern(data, employeeSortPattern);
-                employees = sort(data, employeeSortPattern);
+                positionSortPattern = constructDefaultPattern(data, 'position');
+                employees = sort(data, 'position', positionSortPattern);
                 listEmployees(employees);
                 return true;
             });
+    } else if(value == 'Positions') {
+        return fetchJSON(currentWeek, 'Shifts')
+            .then(shiftsUnsorted => {
+                if (shiftsUnsorted === null) {
+                    return false;
+                }
+
+                shiftsByPostion = shiftsUnsorted.reduce((accumulator, currentItem) => {
+                    const attributeValue = currentItem['assigned_position']; 
+            
+                    
+                    if (!accumulator[attributeValue]) {
+                        accumulator[attributeValue] = [];
+                    }
+            
+                    accumulator[attributeValue].push(currentItem);
+            
+                    return accumulator; 
+                }, {});
+
+                const shiftsSorted = Object.entries(shiftsByPostion).sort((a, b) => a[0].localeCompare(b[0])); 
+
+                listPositions(shiftsSorted);
+
+            })
     } else {
         return Promise.resolve(true);
     }
+}
+
+function listPositions(shiftsSorted) {
+
+    const new_table = document.createElement('div');
+    positionName = "";
+    for(const position of shiftsSorted) {
+        const name = position[0];
+        if(positionName != name) {
+            positionName = name;
+            position_header = document.createElement('div');
+                position_header.classList.add('position-header');
+                position_header.innerText = positionName;
+            new_table.appendChild(position_header);
+        }
+        const posDiv = document.createElement('div');
+        posDiv.classList.add('position-div');
+            const shifts = position[1];
+
+            shiftsByDay = shifts.reduce((accumulator, currentItem) => {
+                const attributeValue = currentItem['day_of_week']; 
+        
+                
+                if (!accumulator[attributeValue]) {
+                    accumulator[attributeValue] = [];
+                }
+        
+                accumulator[attributeValue].push(currentItem);
+        
+                return accumulator; 
+            }, {});
+
+            const week = new Array(7).fill(null).map(() => []);
+
+            for (let i = 0; i < 7; i++) {
+                if (shiftsByDay[i]) {
+                    week[i] = shiftsByDay[i];
+                }
+            }
+
+            i = -1;
+            for(const day of week) {
+                i++;
+                const weekName = document.createElement('a');
+                    weekName.innerText = weekDays[i];
+                posDiv.appendChild(weekName);
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('day-position');
+
+                const numShifts = day.length;
+
+
+                for(const shift of day) {
+
+                    const shiftDiv = document.createElement('div');
+                    shiftDiv.classList.add('pos-shift');
+                    shiftDiv.style.setProperty('width', `calc(100% / ${numShifts})`);
+                        const start = shift['start_time'];
+                        const end = shift['end_time'];
+                        const employee = shift['employeeName'];
+
+                        const extra = 24-end;
+
+                        const hours = end-start;
+
+                        const before = document.createElement('div');
+                        before.style.setProperty('height', `calc(100% * ${start} / 24)`);
+                        before.style.setProperty('width', '100%');
+
+                        const block = document.createElement('div');
+                        block.classList.add('shift');
+                        block.style.setProperty('height', `calc(100% * ${hours}/24)`);
+                        block.style.setProperty('width', '100%');
+                            const employeeName = document.createElement('a');
+                                employeeName.innerText = employee;
+                            block.appendChild(employeeName);
+
+                        const after = document.createElement('div');
+                        after.style.setProperty('height', `calc(100% * ${extra} / 24)`);
+                        after.style.setProperty('width', '100%');
+
+                        shiftDiv.appendChild(before);
+                        shiftDiv.appendChild(block);
+                        shiftDiv.appendChild(after);
+
+                    dayDiv.append(shiftDiv);
+
+                }
+
+                posDiv.appendChild(dayDiv);
+            }
+
+
+        new_table.appendChild(posDiv);
+        
+    }
+    table.innerHTML = new_table.innerHTML;
 }
 
 function setViewIndicator(string) {
@@ -63,7 +197,7 @@ function setViewIndicator(string) {
 
 function listEmployees(employees) {
     const new_table = document.createElement('div');
-    position = ""
+    position = "";
     for(const employee of employees) {
         if(employee.isOnSchedule == 0) {
             continue;
@@ -194,39 +328,32 @@ function generateShiftTime(shift) {
 }
 
 function searchEmployees(term) {
-
+    
 }
 
 positionSortPattern = []
 
-employees = [];
-employeeSortPattern = {
-    parameter: 'position',
-    pattern: positionSortPattern
-}
+positionSortPatternSpecific = []
 
-function constructDefaultPattern(elements, sortPattern) {
-    parameter = sortPattern.parameter;
-    pattern = sortPattern.pattern;
+employees = [];
+
+
+function constructDefaultPattern(elements, parameter) {
 
     updated_pattern = [];
 
-    for(const element in elements) {
+    for(const element of elements) {
         value = element[parameter];
-        if(!pattern.includes(value)) {
+        if(!updated_pattern.includes(value)) {
             updated_pattern.push(value);
         }
     }
-
+    return updated_pattern;
 }
 
-constructDefaultPattern
 
+function sort(elements, parameter,pattern) {
 
-function sort(elements, sortPattern) {
-
-    parameter = sortPattern.parameter;
-    pattern = sortPattern.pattern;
     
     const sortedData = [...elements]; // Create a copy to avoid modifying the original array
 
@@ -264,7 +391,6 @@ function sort(elements, sortPattern) {
 
 function fetchJSON(week, queryType) {
     const url = `db_to_json.php?week=${week}&queryType=${queryType}`;
-    console.log(`url ${url}`)
     return fetch(url)
         .then(response => {
             if(!response.ok) {

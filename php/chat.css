@@ -1,0 +1,25 @@
+#chat-container {
+    width: 90vw;
+    height: 70vh;
+    background-color: rgb(60,60,60);
+    display: flex;
+    flex-direction: column;
+}
+
+#chatInput {
+
+}
+
+.message {
+    width: 60%;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.message.user {
+    margin-left: auto;
+}
+
+.message.ai {
+    margin-right: auto;
+}

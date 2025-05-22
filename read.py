@@ -43,6 +43,8 @@ cursor.execute('''
         position TEXT,
         isOnSchedule INT CHECK (isOnSchedule BETWEEN 0 and 1),
         password_hash TEXT,
+        chat_memory TEXT DEFAULT NULL,
+        last_chat_conversation TEXT DEFAULT '[]',
         is_admin INTEGER DEFAULT 0 CHECK (is_admin BETWEEN 0 and 1),
         UNIQUE (name)
     )

@@ -33,16 +33,13 @@ $dbPath = '../weeks.db'; // Path to your SQLite database
 // E.g., chmod 775 /var/www/html/your_database.sqlite (or stricter)
 
 // --- Database Interaction Functions ---
-function getDbConnection($dbPath) {
-    try {
-        $db = new SQLite3($dbPath);
-        $db->exec('PRAGMA foreign_keys = ON;');
-        // Ensure table exists (create if not)
-        return $db;
-    } catch (Exception $e) {
-        error_log("Database connection error: " . $e->getMessage());
-        return null;
-    }
+
+try {
+    $db = new SQLite3($dbPath);
+    $db->exec('PRAGMA foreign_keys = ON;');
+    // Ensure table exists (create if not)
+} catch (Exception $e) {
+    error_log("Database connection error: " . $e->getMessage());
 }
 
 function getUserChatData($db, $userName) {
@@ -67,7 +64,8 @@ function updateChatData($db, $username, $chatMemory, $lastChatConversation) {
 
 
 // --- Cohere API Call Function ---
-function callCohereAPI($messages, $cohereApiKey) {
+function callCohereAPI($messages) {
+    global $cohereApiKey;
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, 'https://api.cohere.ai/v2/chat'); // Cohere Chat endpoint
@@ -117,14 +115,6 @@ function getPreamble($userName) {
 
 // --- Main API Logic ---
 
-
-
-$db = getDbConnection($dbPath);
-if (!$db) {
-    echo json_encode(['error' => 'Database connection failed.']);
-    http_response_code(500);
-    exit;
-}
 
 session_start();
 
@@ -177,7 +167,7 @@ if ($lastChatConversation) {
 $messages[] = ['role' => 'user', 'content' => $userMessage];
 
 // --- First Call to Cohere ---
-$cohereResponse = callCohereAPI($messages, $cohereApiKey);
+$cohereResponse = callCohereAPI($messages);
 
 if (isset($cohereResponse['error'])) {
     echo json_encode($cohereResponse);
@@ -221,31 +211,76 @@ if ($startIndex !== false) {
     $jsonString = trim($aiMessageText); // Assume the whole string might be JSON
 }
 
-function day_toInt($dayString) {
+function getWeek($dayString) {
     $timestamp = strtotime($dayString);
     if ($timestamp === false) return $dayString;
 
-    $targetDay = (int)date('w', $timestamp); // 0=Sunday, 1=Monday, ..., 6=Saturday
-    $dayIndex = $targetDay === 0 ? 6 : $targetDay - 1; // Make Monday=0, Sunday=6
+    $mondayTimestamp = strtotime('monday this week', $timestamp);
+    $originalDay = ((int)date('w', $timestamp) + 6) % 7;
 
-    $now = strtotime('today');
-    $weekStart = strtotime('monday this week', $now);
 
-    $daysDifference = floor(($timestamp - $weekStart) / 86400); // 86400 = seconds in a day
-    $weekOffset = floor($daysDifference / 7);
-
-    return ['week' => $weekOffset, 'day' => $dayIndex];
+    return [
+        'year' => (int)date('Y', $mondayTimestamp),
+        'month' => (int)date('n', $mondayTimestamp),
+        'day' => (int)date('j', $mondayTimestamp),
+        'originalDay' => $originalDay
+    ];
 }
 
 
 
+
+
 function inform($decoded) {
-    $response = [];
+    global $db;
+    global $messages;
+    $data = [];
     foreach ($decoded as $request) {
-        $day = day_toInt($request);
-        $response[] = $day;
+
+        error_log(print_r($request, true));
+        $weekData = getWeek($request);
+
+        $year = $weekData['year'];
+        $month = $weekData['month'];
+        $day = $weekData['day'];
+
+        $result = $db->query("SELECT week_id FROM Weeks WHERE year = " . $year . " AND month = " . $month . " AND day = " . $day);
+
+        $row = $result->fetchArray(SQLITE3_NUM);
+        $week_id = $row ? $row[0] : null;
+        $day_of_week = $weekData['originalDay'];
+
+        $result = $db->query("SELECT * FROM Shifts WHERE day_of_week = " . $day_of_week . " AND week_id = " . $week_id);
+
+        $shifts = [];
+        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+            $employee_id = $row['employee_id'];
+            $res = $db->query("SELECT name FROM Employees WHERE employee_id = " . $employee_id . " LIMIT 1");
+
+            $rowE = $res->fetchArray(SQLITE3_ASSOC);
+            $name = $rowE ? $rowE['name'] : null;
+
+            $shift = array(
+                'shift' => $row,
+                'employee' => $name
+            );
+
+            $shifts[] = $shift;
+        }
+
+        $data[] = $shifts;
     }
-    return json_encode($response);
+    $dataStr = json_encode($data);
+
+    $messages[] = ['role' => 'system', 'content' => $dataStr];
+
+    $response = callCohereAPI($messages);
+
+    $responseArray = json_decode($response, true);
+
+    $stringResponse = $responseArray['message']['content'][0]['text'];
+    
+    return $stringResponse;
 }
 
 $decoded = json_decode($jsonString, true);

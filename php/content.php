@@ -46,11 +46,10 @@ try {
 
 if($page == 'schedule') {
     readfile('schedule.html');
+} elseif($page == 'chat') {
+    readfile('chat.html');
 } elseif (!$isAdmin) {
     readfile('development.html');
-}
-elseif($page == 'chat') {
-    readfile('chat.html');
 } elseif($page == 'settings') {
     readfile('settings.html');
 } else {

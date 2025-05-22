@@ -1,31 +1,53 @@
 const chatInput = document.getElementById('chatInput');
 const chatContainer = document.getElementById('chat-container');
 
-    chatInput.addEventListener('keyup', function(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
 
-            const userMessage = chatInput.value.trim(); 
+window.visualViewport.addEventListener('resize', () => {
+    const originalVh = window.innerHeight;  // Save on page load before keyboard
+    const currentVh = window.visualViewport.height;
+    
+    const ratio = currentVh / originalVh;   // e.g. 0.6 if keyboard takes 40%
+    element.style.height = (ratio * 90) + 'vh';  // or multiply original element height by ratio
+    
+  });
 
-            if (userMessage !== '') {
 
-                sendMessage(userMessage);
-                console.log(userMessage);
 
-                chatInput.value = '';
-            }
+chatInput.addEventListener('keyup', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+
+        const userMessage = chatInput.value.trim(); 
+
+        if (userMessage !== '') {
+
+            sendMessage(userMessage);
+            console.log(userMessage);
+
+            chatInput.value = '';
         }
-    });
+    }
+});
 
 async function sendMessage(message) {
     try {
 
-        // Display user message in chat container
         const userDiv = document.createElement('div');
         userDiv.classList.add('message');
         userDiv.classList.add('user');
-        userDiv.textContent = `You: ${message}`;
+
+        const label1 = document.createElement('div');
+        label1.textContent = 'You';
+        label1.classList.add('label');
+        userDiv.appendChild(label1);
+
+        const content1 = document.createElement('div');
+        content1.textContent = message;
+        userDiv.appendChild(content1);
+
         chatContainer.appendChild(userDiv);
+
+        chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to bottom
 
         
         const response = await fetch('chat.php', { // Target your chat.php script
@@ -54,7 +76,16 @@ async function sendMessage(message) {
         const aiDiv = document.createElement('div');
         aiDiv.classList.add('message');
         aiDiv.classList.add('ai');
-        aiDiv.textContent = `AI: ${data.response}`; // Assuming chat.php sends back { "response": "AI text" }
+
+        const label = document.createElement('div');
+        label.textContent = 'AI';
+        label.classList.add('label');
+        aiDiv.appendChild(label);
+
+        const content = document.createElement('div');
+        content.textContent = data.response;
+        aiDiv.appendChild(content);
+
         chatContainer.appendChild(aiDiv);
 
         chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to bottom

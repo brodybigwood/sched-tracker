@@ -12,8 +12,8 @@
         rgb(120, 60, 60) 100% /* Final color (transparent) very near the top */
     );
     line-height: 10vh;
+    margin-top: 0;
 
-    border-top: 2px solid rgb(80, 40, 40);
     bottom: 0;
     display: flex;
     flex-direction: row;
@@ -71,8 +71,10 @@ html {
 #currentView {
     position: absolute;
     top: 0;
+    margin-bottom: 0;
     margin: 0;
     width: 100vw; 
-    height: 90vw; 
+    height: 90vh; 
     border: none;
+    padding: none;
 }

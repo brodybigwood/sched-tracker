@@ -179,7 +179,7 @@ function listPositions(shiftsSorted) {
                         block.classList.add('shift');
                         block.style.setProperty('height', `calc(100% * ${hours}/24)`);
                         block.style.setProperty('width', '100%');
-                            const employeeName = document.createElement('a');
+                            const employeeName = document.createElement('h3');
                                 employeeName.innerText = employee;
                             block.appendChild(employeeName);
 

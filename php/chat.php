@@ -240,12 +240,12 @@ function day_toInt($dayString) {
 
 
 function inform($decoded) {
-    $respone = [];
+    $response = [];
     foreach ($decoded as $request) {
         $day = day_toInt($request);
         $response[] = $day;
     }
-    return json_encode($respone);
+    return json_encode($response);
 }
 
 $decoded = json_decode($jsonString, true);
